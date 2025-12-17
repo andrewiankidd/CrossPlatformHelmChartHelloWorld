@@ -9,6 +9,6 @@ spec:
     kubernetes.io/os: linux
   containers:
     - name: linux-demo
-      image: "{{ printf \"%s-linux:%s\" .Values.image.repository .Values.image.tag }}"
+      image: {{ printf "%s-linux:%s" .Values.image.repository .Values.image.tag | quote }}
       imagePullPolicy: IfNotPresent
   restartPolicy: Always

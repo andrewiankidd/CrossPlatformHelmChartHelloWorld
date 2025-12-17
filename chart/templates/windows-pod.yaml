@@ -9,6 +9,6 @@ spec:
     kubernetes.io/os: windows
   containers:
     - name: windows-demo
-      image: "{{ printf \"%s-windows:%s\" .Values.image.repository .Values.image.tag }}"
+      image: {{ printf "%s-windows:%s" .Values.image.repository .Values.image.tag | quote }}
       imagePullPolicy: IfNotPresent
   restartPolicy: Always
