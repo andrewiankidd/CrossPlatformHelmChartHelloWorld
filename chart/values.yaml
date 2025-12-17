@@ -1,0 +1,4 @@
+image:
+  # Both pods reuse the same repository and tag; suffixes are added per OS.
+  repository: ghcr.io/example/crossplatform-helm-chart-hello-world
+  tag: latest

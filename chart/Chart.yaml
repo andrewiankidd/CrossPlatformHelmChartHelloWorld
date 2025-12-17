@@ -1,0 +1,5 @@
+apiVersion: v2
+name: cross-platform-hello
+version: 0.1.0
+appVersion: "0.1.0"
+description: Minimal chart that launches one Linux Pod and one Windows Pod side by side

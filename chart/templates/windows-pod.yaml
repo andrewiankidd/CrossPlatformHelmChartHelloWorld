@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-windows
+  labels:
+    app: {{ .Release.Name }}-windows
+spec:
+  nodeSelector:
+    kubernetes.io/os: windows
+  containers:
+    - name: windows-demo
+      image: "{{ printf \"%s-windows:%s\" .Values.image.repository .Values.image.tag }}"
+      imagePullPolicy: IfNotPresent
+  restartPolicy: Always
