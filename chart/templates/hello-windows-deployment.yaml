@@ -1,0 +1,53 @@
+{{- if .Values.windows.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-windows
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    app.kubernetes.io/component: windows
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-windows
+  template:
+    metadata:
+      labels:
+        app: hello-windows
+    spec:
+      nodeSelector:
+        kubernetes.io/os: windows
+      containers:
+        - name: hello-windows
+          image: "{{ .Values.windows.image.repository }}:{{ .Values.windows.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.windows.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.windows.port | quote }}
+            - name: SQL_HOST
+              value: {{ .Values.infra.mssql.host | quote }}
+            - name: SQL_PORT
+              value: {{ .Values.infra.mssql.port | quote }}
+            - name: SB_HOST
+              value: {{ .Values.infra.servicebus.host | quote }}
+            - name: SB_PORT
+              value: {{ .Values.infra.servicebus.port | quote }}
+            - name: STORAGE_URL
+              value: "http://{{ .Values.infra.storage.host }}:{{ .Values.infra.storage.port }}/"
+            - name: PEER_URL
+              value: "http://hello-linux:{{ .Values.linux.port }}/"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.windows.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.windows.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+{{- end }}

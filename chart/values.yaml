@@ -1,4 +1,24 @@
-image:
-  # Both pods reuse the same repository and tag; suffixes are added per OS.
-  repository: ghcr.io/example/crossplatform-helm-chart-hello-world
-  tag: latest
+linux:
+  enabled: true
+  image:
+    repository: ghcr.io/andrewiankidd/crossplatform-helm-chart-hello-world-linux
+    tag: latest
+  port: 8080
+
+windows:
+  enabled: true
+  image:
+    repository: ghcr.io/andrewiankidd/crossplatform-helm-chart-hello-world-windows
+    tag: latest
+  port: 80
+
+infra:
+  mssql:
+    host: mssql
+    port: "1433"
+  servicebus:
+    host: azureservicebusemulator
+    port: "5672"
+  storage:
+    host: azurestorageemulator
+    port: "10000"

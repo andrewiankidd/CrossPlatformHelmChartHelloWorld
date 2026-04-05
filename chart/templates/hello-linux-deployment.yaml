@@ -1,0 +1,53 @@
+{{- if .Values.linux.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-linux
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    app.kubernetes.io/component: linux
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-linux
+  template:
+    metadata:
+      labels:
+        app: hello-linux
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: hello-linux
+          image: "{{ .Values.linux.image.repository }}:{{ .Values.linux.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.linux.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.linux.port | quote }}
+            - name: SQL_HOST
+              value: {{ .Values.infra.mssql.host | quote }}
+            - name: SQL_PORT
+              value: {{ .Values.infra.mssql.port | quote }}
+            - name: SB_HOST
+              value: {{ .Values.infra.servicebus.host | quote }}
+            - name: SB_PORT
+              value: {{ .Values.infra.servicebus.port | quote }}
+            - name: STORAGE_URL
+              value: "http://{{ .Values.infra.storage.host }}:{{ .Values.infra.storage.port }}/"
+            - name: PEER_URL
+              value: "http://hello-windows:{{ .Values.windows.port }}/"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.linux.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.linux.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+{{- end }}

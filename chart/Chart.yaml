@@ -1,5 +1,8 @@
 apiVersion: v2
 name: cross-platform-hello
-version: 0.1.0
-appVersion: "0.1.0"
-description: Minimal chart that launches one Linux Pod and one Windows Pod side by side
+version: 0.2.0
+appVersion: "0.2.0"
+description: >-
+  Cross-platform hello world chart for Crosspose. Deploys a Linux service and
+  a Windows service side by side, each validating connectivity to shared
+  infrastructure (MSSQL, Service Bus, Azure Storage) and to each other.

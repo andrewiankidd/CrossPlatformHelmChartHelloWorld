@@ -1,0 +1,18 @@
+{{- if .Values.linux.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-linux
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    app.kubernetes.io/component: linux
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-linux
+  ports:
+    - port: {{ .Values.linux.port }}
+      targetPort: {{ .Values.linux.port }}
+      protocol: TCP
+      name: http
+{{- end }}
