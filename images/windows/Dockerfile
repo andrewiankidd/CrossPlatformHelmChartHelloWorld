@@ -1,13 +1,8 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
-
-SHELL ["powershell", "-NoLogo", "-Command", "$ErrorActionPreference='Stop';"]
-
-RUN Invoke-WebRequest -Uri "https://aka.ms/sqlcmd2022" -OutFile "C:\\sqlcmd.msi"; \
-    Start-Process msiexec.exe -ArgumentList '/i', 'C:\\sqlcmd.msi', '/qn', '/norestart' -Wait; \
-    Remove-Item "C:\\sqlcmd.msi"
-
-ENV PATH="C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0"
-
-COPY entrypoint.ps1 C:/entrypoint.ps1
-
-ENTRYPOINT ["powershell", "-NoLogo", "-ExecutionPolicy", "Bypass", "-File", "C:/entrypoint.ps1"]
+FROM node:22-windowsservercore-ltsc2022
+WORKDIR C:/app
+COPY server.js .
+ENV PORT=80
+EXPOSE 80
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s \
+  CMD powershell -Command "try { $r = Invoke-WebRequest -Uri http://localhost:80/ -UseBasicParsing -TimeoutSec 3; if ($r.StatusCode -lt 500) { exit 0 } else { exit 1 } } catch { exit 1 }"
+CMD ["node", "server.js"]

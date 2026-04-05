@@ -1,16 +1,8 @@
-FROM mcr.microsoft.com/mssql-tools AS mssql_tools
-
-FROM alpine:3.18
-
-RUN apk add --no-cache ca-certificates curl gcompat jq openssl \
-  && update-ca-certificates
-
-ENV PATH=/opt/mssql-tools/bin:$PATH \
-    LD_LIBRARY_PATH=/opt/microsoft/msodbcsql18/lib64:/opt/microsoft/odbc/lib64
-
-COPY --from=mssql_tools /opt/mssql-tools /opt/mssql-tools
-COPY --from=mssql_tools /opt/microsoft /opt/microsoft
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+FROM node:22-alpine
+WORKDIR /app
+COPY server.js .
+ENV PORT=8080
+EXPOSE 8080
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s \
+  CMD wget -qO- http://localhost:8080/ || exit 1
+CMD ["node", "server.js"]
