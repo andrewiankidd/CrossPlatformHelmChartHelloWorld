@@ -1,0 +1,15 @@
+# Normalize all text files to LF in the repo, check out as native line endings
+* text=auto eol=lf
+
+# Shell scripts must stay LF even on Windows
+*.sh text eol=lf
+
+# Windows-specific scripts stay CRLF
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary files
+*.tgz binary
+*.png binary
+*.ico binary
