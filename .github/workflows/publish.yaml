@@ -24,6 +24,9 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      - name: Copy shared server.js into build context
+        run: cp images/server.js images/linux/server.js
+
       - name: Build the Linux image
         run: |
           docker build -t ${IMAGE_REPOSITORY}-linux:${IMAGE_TAG} ./images/linux
@@ -46,6 +49,10 @@ jobs:
         shell: pwsh
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Copy shared server.js into build context
+        shell: pwsh
+        run: Copy-Item images/server.js images/windows/server.js
 
       - name: Build the Windows image
         shell: pwsh
