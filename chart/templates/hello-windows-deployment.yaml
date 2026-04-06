@@ -38,16 +38,6 @@ spec:
               value: "http://{{ .Values.infra.storage.host }}:{{ .Values.infra.storage.port }}/"
             - name: PEER_URL
               value: "http://hello-linux:{{ .Values.linux.port }}/"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.windows.port }}
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.windows.port }}
-            initialDelaySeconds: 30
-            periodSeconds: 10
+          # Healthcheck defined in Dockerfile using node (not powershell)
+          # to support servercore images without PowerShell in PATH.
 {{- end }}
