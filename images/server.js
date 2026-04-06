@@ -129,7 +129,7 @@ const server = http.createServer(async (req, res) => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="/favicon.ico">
-  <title>Crosspose Hello World &mdash; ${OS}</title>
+  <title>Crosspose Hello World - ${OS}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5;
