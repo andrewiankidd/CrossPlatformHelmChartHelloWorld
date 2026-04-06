@@ -87,6 +87,26 @@ function peerProbe(url, timeout = 8000) {
   });
 }
 
+// Cache check results — run probes on a background interval so HTTP responses
+// are instant and don't cause cascading timeouts between peer containers.
+let cachedResults = CHECKS.map((c) => ({ name: c.name, url: c.url, ok: false, detail: 'starting...' }));
+let cachedAllOk = false;
+
+async function runChecks() {
+  const results = await Promise.all(
+    CHECKS.map(async (c) => ({ name: c.name, url: c.url, ...(await c.fn()) }))
+  );
+  cachedResults = results;
+  cachedAllOk = results.every((r) => r.ok);
+  const ts = new Date().toISOString();
+  results.forEach((r) => console.log(`[${ts}] ${r.ok ? 'OK' : 'FAIL'} ${r.name}: ${r.detail}`));
+  console.log(`[${ts}] Overall: ${cachedAllOk ? 'HEALTHY' : 'UNHEALTHY'}`);
+}
+
+// Run checks immediately then every 5 seconds
+runChecks();
+setInterval(runChecks, 5000);
+
 const server = http.createServer(async (req, res) => {
   if (req.url === '/favicon.ico') {
     try {
@@ -100,15 +120,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  const results = await Promise.all(
-    CHECKS.map(async (c) => ({ name: c.name, url: c.url, ...(await c.fn()) }))
-  );
-  const allOk = results.every((r) => r.ok);
-
-  // Log each check result so container logs show diagnostic info
-  const ts = new Date().toISOString();
-  results.forEach((r) => console.log(`[${ts}] ${r.ok ? 'OK' : 'FAIL'} ${r.name}: ${r.detail}`));
-  console.log(`[${ts}] Overall: ${allOk ? 'HEALTHY' : 'UNHEALTHY'}`);
+  const results = cachedResults;
+  const allOk = cachedAllOk;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
