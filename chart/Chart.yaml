@@ -1,7 +1,7 @@
 apiVersion: v2
 name: cross-platform-hello
-version: 0.3.0
-appVersion: "0.3.0"
+version: 0.4.0
+appVersion: "0.4.0"
 description: >-
   Cross-platform hello world chart for Crosspose. Deploys a Linux service and
   a Windows service side by side, each validating connectivity to shared

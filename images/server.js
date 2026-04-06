@@ -1,8 +1,11 @@
 const http = require('http');
 const net = require('net');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = parseInt(process.env.PORT || '8080');
 const OS = process.platform === 'win32' ? 'Windows' : 'Linux';
+const FAVICON = path.join(__dirname, 'favicon.ico');
 
 const CHECKS = [
   {
@@ -20,10 +23,11 @@ const CHECKS = [
   {
     name: `Peer Service (${OS === 'Windows' ? 'Linux' : 'Windows'})`,
     fn: () => httpProbe(process.env.PEER_URL),
+    url: process.env.PEER_URL,
   },
 ];
 
-function tcpProbe(host, port, timeout = 3000) {
+function tcpProbe(host, port, timeout = 5000) {
   return new Promise((resolve) => {
     if (!host) return resolve({ ok: false, detail: 'not configured' });
     const sock = new net.Socket();
@@ -44,7 +48,7 @@ function tcpProbe(host, port, timeout = 3000) {
   });
 }
 
-function httpProbe(url, timeout = 3000) {
+function httpProbe(url, timeout = 8000) {
   return new Promise((resolve) => {
     if (!url) return resolve({ ok: false, detail: 'not configured' });
     try {
@@ -65,28 +69,40 @@ function httpProbe(url, timeout = 3000) {
 
 const server = http.createServer(async (req, res) => {
   if (req.url === '/favicon.ico') {
-    res.writeHead(204);
-    res.end();
+    try {
+      const ico = fs.readFileSync(FAVICON);
+      res.writeHead(200, { 'Content-Type': 'image/x-icon', 'Cache-Control': 'public, max-age=86400' });
+      res.end(ico);
+    } catch {
+      res.writeHead(204);
+      res.end();
+    }
     return;
   }
 
   const results = await Promise.all(
-    CHECKS.map(async (c) => ({ name: c.name, ...(await c.fn()) }))
+    CHECKS.map(async (c) => ({ name: c.name, url: c.url, ...(await c.fn()) }))
   );
   const allOk = results.every((r) => r.ok);
+
+  // Log each check result so container logs show diagnostic info
+  const ts = new Date().toISOString();
+  results.forEach((r) => console.log(`[${ts}] ${r.ok ? 'OK' : 'FAIL'} ${r.name}: ${r.detail}`));
+  console.log(`[${ts}] Overall: ${allOk ? 'HEALTHY' : 'UNHEALTHY'}`);
 
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico">
   <title>Crosspose Hello World &mdash; ${OS}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5;
            display: flex; justify-content: center; padding: 40px 20px; }
     .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08);
-            max-width: 520px; width: 100%; padding: 32px; }
+            max-width: 560px; width: 100%; padding: 32px; }
     h1 { font-size: 20px; margin-bottom: 4px; }
     .os { color: #888; font-size: 14px; margin-bottom: 20px; }
     .status { font-size: 16px; font-weight: 600; padding: 12px 16px; border-radius: 8px;
@@ -99,7 +115,8 @@ const server = http.createServer(async (req, res) => {
     li:last-child { border-bottom: none; }
     .icon { font-size: 20px; flex-shrink: 0; }
     .name { font-weight: 500; }
-    .detail { color: #888; font-size: 13px; margin-left: auto; }
+    .url { color: #aaa; font-size: 11px; font-family: monospace; }
+    .detail { color: #888; font-size: 13px; margin-left: auto; white-space: nowrap; }
     .ts { color: #bbb; font-size: 11px; text-align: center; margin-top: 16px; }
   </style>
 </head>
@@ -114,7 +131,7 @@ const server = http.createServer(async (req, res) => {
           (r) =>
             `<li>
           <span class="icon">${r.ok ? '&#9989;' : '&#10060;'}</span>
-          <span class="name">${r.name}</span>
+          <span class="name">${r.name}${r.url ? '<br><span class="url">' + r.url + '</span>' : ''}</span>
           <span class="detail">${r.detail}</span>
         </li>`
         )

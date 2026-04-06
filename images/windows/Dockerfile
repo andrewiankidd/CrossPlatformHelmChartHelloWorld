@@ -12,8 +12,9 @@ ENV PATH="C:\nodejs;C:\Windows\System32;C:\Windows"
 
 WORKDIR C:/app
 COPY server.js .
+COPY favicon.ico .
 ENV PORT=80
 EXPOSE 80
-HEALTHCHECK --interval=10s --timeout=3s --start-period=30s \
-  CMD powershell -Command "try { $r = Invoke-WebRequest -Uri http://localhost:80/ -UseBasicParsing -TimeoutSec 3; if ($r.StatusCode -lt 500) { exit 0 } else { exit 1 } } catch { exit 1 }"
+HEALTHCHECK --interval=10s --timeout=8s --start-period=30s \
+  CMD powershell -Command "try { $r = Invoke-WebRequest -Uri http://localhost:80/ -UseBasicParsing -TimeoutSec 8; if ($r.StatusCode -lt 500) { exit 0 } else { exit 1 } } catch { exit 1 }"
 CMD ["C:\\nodejs\\node.exe", "server.js"]

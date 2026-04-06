@@ -30,6 +30,7 @@ custom-rules:
         environment:
           ACCEPT_EULA: "Y"
           SQL_SERVER: mssql
+          MSSQL_SA_PASSWORD: "P@ssw0rd!123"
         depends_on:
           mssql:
             condition: service_healthy
