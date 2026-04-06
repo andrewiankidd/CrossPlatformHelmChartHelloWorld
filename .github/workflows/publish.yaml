@@ -3,6 +3,11 @@ name: Publish Hello World Images and Chart
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'images/**'
+      - 'chart/**'
+      - 'crosspose/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 env:
