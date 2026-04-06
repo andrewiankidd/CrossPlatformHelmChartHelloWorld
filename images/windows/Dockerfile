@@ -15,6 +15,7 @@ COPY server.js .
 COPY favicon.ico .
 ENV PORT=80
 EXPOSE 80
+COPY healthcheck.js .
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s \
-  CMD C:\nodejs\node.exe -e "const h=require('http');h.get('http://localhost:80/',r=>{process.exit(r.statusCode<500?0:1)}).on('error',()=>process.exit(1))"
+  CMD ["C:\\nodejs\\node.exe", "C:\\app\\healthcheck.js"]
 CMD ["C:\\nodejs\\node.exe", "server.js"]
