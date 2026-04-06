@@ -74,3 +74,7 @@ The `crosspose/dekompose.yml` defines three infra services that Crosspose provis
 - **MSSQL 2022** — `mcr.microsoft.com/mssql/server:2022-latest` with SA password and healthcheck
 - **Azure Service Bus Emulator** — `mcr.microsoft.com/azure-messaging/servicebus-emulator:latest`
 - **Azurite** — `mcr.microsoft.com/azure-storage/azurite:latest` (blob, queue, table)
+
+## Screenshot
+
+![Crosspose Hello World](.github/screencap.png)
