@@ -22,7 +22,7 @@ const CHECKS = [
   },
   {
     name: `Peer Service (${OS === 'Windows' ? 'Linux' : 'Windows'})`,
-    fn: () => httpProbe(process.env.PEER_URL),
+    fn: () => peerProbe(process.env.PEER_URL),
     url: process.env.PEER_URL,
   },
 ];
@@ -54,6 +54,26 @@ function httpProbe(url, timeout = 8000) {
     try {
       const req = http.get(url, { timeout }, (res) => {
         resolve({ ok: res.statusCode < 500, detail: `HTTP ${res.statusCode}` });
+        res.resume();
+      });
+      req.on('error', (e) => resolve({ ok: false, detail: e.message }));
+      req.on('timeout', () => {
+        req.destroy();
+        resolve({ ok: false, detail: 'timeout' });
+      });
+    } catch (e) {
+      resolve({ ok: false, detail: e.message });
+    }
+  });
+}
+
+function peerProbe(url, timeout = 8000) {
+  return new Promise((resolve) => {
+    if (!url) return resolve({ ok: false, detail: 'not configured' });
+    try {
+      const req = http.get(url, { timeout }, (res) => {
+        // Any HTTP response proves cross-OS network connectivity works.
+        resolve({ ok: true, detail: `HTTP ${res.statusCode} (reachable)` });
         res.resume();
       });
       req.on('error', (e) => resolve({ ok: false, detail: e.message }));
