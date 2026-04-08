@@ -29,7 +29,7 @@ images/
   windows/                Windows image + healthcheck.js (servercore + node)
 ```
 
-The `chart/crosspose/` directory follows the [Crosspose helm chart authoring convention](https://github.com/andrewiankidd/crosspose/blob/main/docs/helm-chart-authoring.md). When the chart is pulled via the Crosspose GUI, these files are automatically extracted as named siblings next to the chart `.tgz` (e.g. `cross-platform-hello-0.5.0.values.yaml`).
+The `chart/crosspose/` directory follows the [Crosspose helm chart authoring convention](https://github.com/andrewiankidd/crosspose/blob/main/docs/helm-chart-authoring.md). When the chart is pulled via the Crosspose GUI, these files are automatically extracted as named siblings next to the chart `.tgz` (e.g. `cross-platform-hello-0.4.0.values.yaml`).
 
 ## Use with Crosspose
 
@@ -46,11 +46,11 @@ The `chart/crosspose/` directory follows the [Crosspose helm chart authoring con
 helm pull oci://ghcr.io/andrewiankidd/charts/cross-platform-hello --destination .
 
 # Extract the embedded crosspose defaults from the chart bundle
-tar -xzf cross-platform-hello-0.5.0.tgz cross-platform-hello/crosspose
+tar -xzf cross-platform-hello-0.4.0.tgz cross-platform-hello/crosspose
 
 # Dekompose
 dotnet run --project src/Crosspose.Dekompose.Cli -- `
-  --chart cross-platform-hello-0.5.0.tgz `
+  --chart cross-platform-hello-0.4.0.tgz `
   --values cross-platform-hello/crosspose/values.yaml `
   --dekompose-config cross-platform-hello/crosspose/dekompose.yml `
   --infra --remap-ports --compress
