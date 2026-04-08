@@ -6,7 +6,6 @@ on:
     paths:
       - 'images/**'
       - 'chart/**'
-      - 'crosspose/**'
       - '.github/workflows/**'
   workflow_dispatch:
 
